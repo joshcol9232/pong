@@ -30,3 +30,7 @@ bool Paddle::check_collision(const Ball& b) const {
   return std::abs(dist_x) < constants::PADDLE_WIDTH/2 + constants::BALL_RADIUS &&
       std::abs(dist_y) < constants::PADDLE_HEIGHT/2 + constants::BALL_RADIUS;
 }
+
+void Paddle::reset() {
+  y_pos_ = static_cast<double>(constants::WINDOW_HEIGHT/2);
+}

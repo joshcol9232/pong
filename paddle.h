@@ -11,6 +11,7 @@ public:
 
   bool is_left() const { return left_side_; }
   void move(const double dt, const bool direction);
+  void reset();
 
   const double get_x() const { return x_pos_; }
   const double get_y() const { return y_pos_; }

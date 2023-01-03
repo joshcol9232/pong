@@ -12,12 +12,30 @@
 
 using Eigen::Vector2d;
 
+namespace {
+
+inline bool check_goal(const Ball& b, bool check_left) {
+  return (check_left && b.get_x() < 0.0) ||
+      (!check_left && b.get_x() > constants::WINDOW_WIDTH);
+}
+
+}  // anonymous namespace
+
 int main() {
   Ball ball(Vector2d(constants::WINDOW_WIDTH/2, constants::WINDOW_HEIGHT/2),
             constants::BALL_RADIUS);
 
   Paddle left_paddle(true);
   Paddle right_paddle(false);
+
+  size_t left_score = 0;
+  size_t right_score = 0;
+
+  auto reset = [&]() {
+    left_paddle.reset();
+    right_paddle.reset();
+    ball.reset();
+  };
 
   sf::RenderWindow window(sf::VideoMode(constants::WINDOW_WIDTH,
                                         constants::WINDOW_HEIGHT),
@@ -62,6 +80,14 @@ int main() {
 
     // update
     ball.update(DT);
+
+    if (check_goal(ball, true)) { // check left
+      ++left_score;
+      reset();
+    } else if (check_goal(ball, false)) {
+      ++right_score;
+      reset();
+    }
 
     // debug with mouse
 //    sf::Vector2i localPosition = sf::Mouse::getPosition(window);

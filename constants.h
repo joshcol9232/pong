@@ -3,13 +3,19 @@
 
 #include <cstddef>
 
+//#define DEBUG   // For debug output
+
+#ifdef DEBUG
+#include <iostream>
+#endif
+
 namespace constants {
   const size_t WINDOW_WIDTH = 800;
   const size_t WINDOW_HEIGHT = 600;
 
-  const double BALL_STARTING_SPEED = 100.0;
+  const double BALL_STARTING_SPEED = 200.0;
   const double BALL_RADIUS = 10.0;
-  const double BALL_SPEED_MULTIPLIER = 1.1;
+  const double BALL_SPEED_MULTIPLIER = 1.12;
 
   const double PADDLE_WIDTH = 15.0;
   const double PADDLE_HEIGHT = 150.0;

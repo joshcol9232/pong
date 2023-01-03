@@ -17,6 +17,7 @@ class Ball {
   void update(const double dt);
   void set_pos(const double x, const double y);
   void collide(const Paddle& p);
+  void reset();
 
   inline double get_x() const { return pos_.x(); }
   inline double get_y() const { return pos_.y(); }
