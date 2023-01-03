@@ -8,11 +8,13 @@ using Eigen::Vector2d;
 class Ball {
  public:
   Ball();
-  Ball(Vector2d pos, double radius, double start_speed);
+  Ball(Vector2d pos, double radius);
 
   void update(const double dt);
+//  void bounce();
 
-  inline const Vector2d& get_pos() const { return pos_; }
+  inline const double get_x() const { return pos_.x(); }
+  inline const double get_y() const { return pos_.y(); }
 
  private:
   Vector2d pos_;

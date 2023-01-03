@@ -11,7 +11,9 @@ find_package(SFML 2.5.1 COMPONENTS system graphics audio network REQUIRED)
 find_package(Eigen3 3.4.0 REQUIRED)
 
 add_executable(pong main.cpp
-               ball.h ball.cpp)
+               constants.h
+               ball.h ball.cpp
+               paddle.h paddle.cpp)
 
 target_link_libraries(pong PRIVATE Eigen3::Eigen sfml-audio sfml-graphics sfml-network sfml-system)
 
