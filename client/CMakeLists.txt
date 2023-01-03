@@ -12,7 +12,7 @@ find_package(Eigen3 3.4.0 REQUIRED)
 
 add_executable(pong_client main.cpp
                constants.h
-               msg_type.h)
+               msg_type.h msg_type.cpp)
 
 target_link_libraries(pong_client PRIVATE Eigen3::Eigen sfml-audio sfml-graphics sfml-network sfml-system)
 

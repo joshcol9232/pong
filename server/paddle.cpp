@@ -1,6 +1,8 @@
 #include "paddle.h"
 #include "constants.h"
 
+#include <iostream>
+
 Paddle::Paddle(bool is_left) :
   left_side_(is_left), y_pos_(constants::WINDOW_HEIGHT/2.0),
   x_pos_([&]() -> const double {
@@ -19,6 +21,7 @@ void Paddle::move(const double dt, const bool direction) {
   const bool below_top = y_pos_ + dy - constants::PADDLE_HEIGHT/2.0 > 0.0;
 
   if (above_bottom && below_top) {
+    std::cout << "MOVING " << left_side_ << " :)" << std::endl;
     y_pos_ += dy;
   }
 }

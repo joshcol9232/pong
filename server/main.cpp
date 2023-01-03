@@ -32,14 +32,6 @@ void get_non_blocking_client(sf::TcpSocket& client, sf::TcpListener& listener) {
             << std::endl;
 }
 
-void send_message_type(sf::TcpSocket& client, MessageType m) {
-  size_t sent;
-  client.send(&m, sizeof(int), sent);
-  if (sent != sizeof(int)) {
-    throw std::runtime_error("Error: Could not send message type.");
-  }
-}
-
 }  // anonymous namespace
 
 int main() {
@@ -68,8 +60,8 @@ int main() {
   get_non_blocking_client(right_client, listener);
 
   // client setup
-  send_message_type(left_client, MessageType::YouAreLeft);
-  send_message_type(right_client, MessageType::YouAreRight);
+  send_msg_type(left_client, MessageType::YouAreLeft);
+  send_msg_type(right_client, MessageType::YouAreRight);
 
   sf::Clock deltaClock;
   bool stop = false;
@@ -80,26 +72,11 @@ int main() {
     sf::Time dt_Time = deltaClock.restart();
     const double dt = static_cast<double>(dt_Time.asSeconds());
 
-    /*
-    // Process inputs
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
-      right_paddle.move(dt, false);
-    } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
-      right_paddle.move(dt, true);
-    }
-
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
-      left_paddle.move(dt, false);
-    } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
-      left_paddle.move(dt, true);
-    }
-    */
-
     // update
-    std::cout << "Updating ball: " << dt << std::endl;
+//    std::cout << "Updating ball: " << dt << std::endl;
     ball.update(dt);
-    std::cout << "Ball pos: " << ball.get_x()
-              << ", " << ball.get_y() << std::endl;
+//    std::cout << "Ball pos: " << ball.get_x()
+//              << ", " << ball.get_y() << std::endl;
 
     double left_score_incr = 0.0;
     double right_score_incr = 0.0;
@@ -121,30 +98,49 @@ int main() {
       ball.collide(right_paddle);
     }
 
-    double left_data[5] = { ball.get_x(), ball.get_y(), right_paddle.get_y(), left_score_incr, right_score_incr };
+    // Check inputs
 
-    send_message_type(left_client, MessageType::GameData);
-    size_t sent;
+    MessageType left_msg_type = recv_msg_type(left_client);
+    MessageType right_msg_type = recv_msg_type(right_client);
 
-    left_client.send(&left_data, sizeof(double) * 5, sent);
-    if (sent != sizeof(double) * 5) {
-      throw std::runtime_error("Error: Could not send game data.");
+    if (left_msg_type == MessageType::MoveUp) {
+      left_paddle.move(dt, false);
+    } else if (left_msg_type == MessageType::MoveDown) {
+      left_paddle.move(dt, true);
     }
 
-    double right_data[5] {
-      constants::WINDOW_WIDTH - ball.get_x(),  // flip
-      ball.get_y(),
-      left_paddle.get_y(),
-      left_score_incr,
-      right_score_incr
+    if (right_msg_type == MessageType::MoveUp) {
+      right_paddle.move(dt, false);
+    } else if (right_msg_type == MessageType::MoveDown) {
+      right_paddle.move(dt, true);
+    }
+
+    double left_data[6] = {
+      ball.get_x(), ball.get_y(),
+      left_paddle.get_y(), right_paddle.get_y(),
+      left_score_incr, right_score_incr
     };
 
-    send_message_type(right_client, MessageType::GameData);
-    right_client.send(&right_data, sizeof(double) * 5, sent);
-    if (sent != sizeof(double) * 5) {
+    send_msg_type(left_client, MessageType::GameData);
+    size_t sent;
+
+    left_client.send(&left_data, sizeof(double) * 6, sent);
+    if (sent != sizeof(double) * 6) {
       throw std::runtime_error("Error: Could not send game data.");
     }
 
+    double right_data[6] {
+      constants::WINDOW_WIDTH - ball.get_x(),  // flip
+      ball.get_y(),
+      right_paddle.get_y(), left_paddle.get_y(),
+      left_score_incr, right_score_incr
+    };
+
+    send_msg_type(right_client, MessageType::GameData);
+    right_client.send(&right_data, sizeof(double) * 6, sent);
+    if (sent != sizeof(double) * 6) {
+      throw std::runtime_error("Error: Could not send game data.");
+    }
 
     sf::sleep(sf::milliseconds(1));
   }

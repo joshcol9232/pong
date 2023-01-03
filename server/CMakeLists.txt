@@ -14,7 +14,7 @@ add_executable(pong_server main.cpp
                constants.h
                ball.h ball.cpp
                paddle.h paddle.cpp
-               msg_type.h)
+               msg_type.h msg_type.cpp)
 
 target_link_libraries(pong_server PRIVATE Eigen3::Eigen sfml-network sfml-system)
 

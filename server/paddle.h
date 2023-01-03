@@ -13,8 +13,8 @@ public:
   void move(const double dt, const bool direction);
   void reset();
 
-  const double get_x() const { return x_pos_; }
-  const double get_y() const { return y_pos_; }
+  double get_x() const { return x_pos_; }
+  double get_y() const { return y_pos_; }
 
   bool check_collision(const Ball& b) const;
 

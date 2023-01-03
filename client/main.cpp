@@ -16,16 +16,6 @@
 
 using Eigen::Vector2d;
 
-MessageType recv_msg_type(sf::TcpSocket& socket) {
-  size_t recv;
-  int msg_type;
-  socket.receive(&msg_type, sizeof(int), recv);
-  if (recv != sizeof(int)) {
-    throw std::runtime_error("Error: Wrong num of bytes recieved.");
-  }
-  return static_cast<MessageType>(msg_type);
-}
-
 int main() {
   size_t left_score = 0;
   size_t right_score = 0;
@@ -96,9 +86,9 @@ int main() {
   }
 
   // [ball.x, ball.y, enemy.y, left score incr, right score incr]
-#define GAME_DATA_SIZE 5
+#define GAME_DATA_SIZE 6
   constexpr size_t expected_size = sizeof(double) * GAME_DATA_SIZE;
-  double game_data[GAME_DATA_SIZE] = {0, 0, 0, 0, 0};
+  double game_data[GAME_DATA_SIZE] = {0, 0, 0, 0, 0, 0};
 
   while (window.isOpen()) {
     sf::Event event;
@@ -113,46 +103,16 @@ int main() {
 
     // Process inputs
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
-//      right_paddle.move(dt, false);
+      send_msg_type(socket, MessageType::MoveUp);
     } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
-//      right_paddle.move(dt, true);
+      send_msg_type(socket, MessageType::MoveDown);
     }
-
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
-//      left_paddle.move(dt, false);
-    } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
-//      left_paddle.move(dt, true);
-    }
-
-    // update
-
-
-//    if (check_goal(ball, true)) { // check left
-//      ++right_score;
-//      right_score_text.setString(std::to_string(right_score));
-//      reset();
-//    } else if (check_goal(ball, false)) {
-//      ++left_score;
-//      left_score_text.setString(std::to_string(left_score));
-//      reset();
-//    }
-
-    // debug with mouse
-//    sf::Vector2i localPosition = sf::Mouse::getPosition(window);
-//    ball.update_mouse(static_cast<double>(localPosition.x),
-//                      static_cast<double>(localPosition.y));
-
-//    if (left_paddle.check_collision(ball)) {
-//      ball.collide(left_paddle);
-//    } else if (right_paddle.check_collision(ball)) {
-//      ball.collide(right_paddle);
-//    }
 
     // Get positions from server
     MessageType msg_type = recv_msg_type(socket);
 
     if (msg_type == MessageType::GameData) {
-      std::cout << "Getting game data..." << std::endl;
+//      std::cout << "Getting game data..." << std::endl;
 
       // Collect game data
       size_t recv;
@@ -160,9 +120,11 @@ int main() {
       if (recv != expected_size) {
         throw std::runtime_error("Error: Failed to collect game data.");
       }
+      /*
       std::cout << game_data[0] << ", " << game_data[1] << ", "
                 << game_data[2] << ", " << game_data[3] << ", "
-                << game_data[4] << std::endl;
+                << game_data[4] << ", " << game_data[5] << std::endl;
+      */
     }
 
     // Draw
@@ -176,11 +138,13 @@ int main() {
     window.draw(ball_shape);
 
     // draw paddles
-    paddle_shape.setPosition(10.0, game_data[2]);
+    std::cout << "2: " << game_data[2] << std::endl;
+    std::cout << "3: " << game_data[3] << std::endl;
+    paddle_shape.setPosition(constants::PADDLE_OFFSET, game_data[2]);
     window.draw(paddle_shape);
-//    paddle_shape.setPosition(right_paddle.get_x(),
-//                             right_paddle.get_y());
-//    window.draw(paddle_shape);
+    paddle_shape.setPosition(constants::WINDOW_WIDTH - constants::PADDLE_OFFSET, game_data[3]);
+    window.draw(paddle_shape);
+
 
     window.display();
   }
