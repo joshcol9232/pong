@@ -3,7 +3,11 @@
 
 #include <Eigen/Dense>
 
+#include "paddle.h"
+
 using Eigen::Vector2d;
+
+class Paddle;  // declare
 
 class Ball {
  public:
@@ -11,10 +15,12 @@ class Ball {
   Ball(Vector2d pos, double radius);
 
   void update(const double dt);
-//  void bounce();
+  void update_mouse(const double x, const double y);
+  void collide(const Paddle& p);
 
-  inline const double get_x() const { return pos_.x(); }
-  inline const double get_y() const { return pos_.y(); }
+  inline double get_x() const { return pos_.x(); }
+  inline double get_y() const { return pos_.y(); }
+  inline double get_radius() const { return radius_; }
 
  private:
   Vector2d pos_;

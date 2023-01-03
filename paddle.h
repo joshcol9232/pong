@@ -3,6 +3,8 @@
 
 #include "ball.h"
 
+class Ball;
+
 class Paddle {
 public:
   Paddle(bool is_left);

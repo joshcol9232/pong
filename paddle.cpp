@@ -24,9 +24,9 @@ void Paddle::move(const double dt, const bool direction) {
 }
 
 bool Paddle::check_collision(const Ball& b) const {
-  const double dist_x = x_pos_ - b.get_x();
-  const double dist_y = y_pos_ - b.get_y();
+  const double dist_x = b.get_x() - x_pos_;
+  const double dist_y = b.get_y() - y_pos_;
 
-  return std::abs(dist_x) < constants::PADDLE_WIDTH &&
-      std::abs(dist_y) < constants::PADDLE_HEIGHT/2;
+  return std::abs(dist_x) < constants::PADDLE_WIDTH/2 + constants::BALL_RADIUS &&
+      std::abs(dist_y) < constants::PADDLE_HEIGHT/2 + constants::BALL_RADIUS;
 }
