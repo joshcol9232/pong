@@ -1,42 +1,23 @@
 #include <iostream>
 #include <string>
+#include <stdexcept>
 
 #include <SFML/Graphics.hpp>
+#include <SFML/Network.hpp>
 
 #include <Eigen/Dense>
 
-#include "ball.h"
-#include "paddle.h"
 #include "constants.h"
 
 #define DT 1.0/60.0
 
+#define SERVER_IP "localhost"
+
 using Eigen::Vector2d;
 
-namespace {
-
-inline bool check_goal(const Ball& b, bool check_left) {
-  return (check_left && b.get_x() < 0.0) ||
-      (!check_left && b.get_x() > constants::WINDOW_WIDTH);
-}
-
-}  // anonymous namespace
-
 int main() {
-  Ball ball(Vector2d(constants::WINDOW_WIDTH/2, constants::WINDOW_HEIGHT/2),
-            constants::BALL_RADIUS);
-
-  Paddle left_paddle(true);
-  Paddle right_paddle(false);
-
   size_t left_score = 0;
   size_t right_score = 0;
-
-  auto reset = [&]() {
-    left_paddle.reset();
-    right_paddle.reset();
-    ball.reset();
-  };
 
   sf::RenderWindow window(sf::VideoMode(constants::WINDOW_WIDTH,
                                         constants::WINDOW_HEIGHT),
@@ -79,6 +60,18 @@ int main() {
   paddle_shape.setOrigin(constants::PADDLE_WIDTH/2.0,
                          constants::PADDLE_HEIGHT/2.0);
 
+
+  // Connect to server
+  sf::TcpSocket socket;
+  socket.setBlocking(true);
+  sf::Socket::Status status = socket.connect(SERVER_IP, 53000);
+  if (status != sf::Socket::Done) {
+    throw std::runtime_error("ERROR: Could not connect to server...");
+  }
+
+  std::cout << "Connected :) : " << socket.getRemoteAddress() << ":"
+            << socket.getRemotePort() << std::endl;
+
   while (window.isOpen()) {
     sf::Event event;
     while (window.pollEvent(event)) {
@@ -92,40 +85,54 @@ int main() {
 
     // Process inputs
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
-      right_paddle.move(dt, false);
+//      right_paddle.move(dt, false);
     } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
-      right_paddle.move(dt, true);
+//      right_paddle.move(dt, true);
     }
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
-      left_paddle.move(dt, false);
+//      left_paddle.move(dt, false);
     } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
-      left_paddle.move(dt, true);
+//      left_paddle.move(dt, true);
     }
 
     // update
-    ball.update(dt);
 
-    if (check_goal(ball, true)) { // check left
-      ++right_score;
-      right_score_text.setString(std::to_string(right_score));
-      reset();
-    } else if (check_goal(ball, false)) {
-      ++left_score;
-      left_score_text.setString(std::to_string(left_score));
-      reset();
-    }
+
+//    if (check_goal(ball, true)) { // check left
+//      ++right_score;
+//      right_score_text.setString(std::to_string(right_score));
+//      reset();
+//    } else if (check_goal(ball, false)) {
+//      ++left_score;
+//      left_score_text.setString(std::to_string(left_score));
+//      reset();
+//    }
 
     // debug with mouse
 //    sf::Vector2i localPosition = sf::Mouse::getPosition(window);
 //    ball.update_mouse(static_cast<double>(localPosition.x),
 //                      static_cast<double>(localPosition.y));
 
-    if (left_paddle.check_collision(ball)) {
-      ball.collide(left_paddle);
-    } else if (right_paddle.check_collision(ball)) {
-      ball.collide(right_paddle);
+//    if (left_paddle.check_collision(ball)) {
+//      ball.collide(left_paddle);
+//    } else if (right_paddle.check_collision(ball)) {
+//      ball.collide(right_paddle);
+//    }
+
+    // Get positions from server
+    constexpr size_t expected_size = 5 * sizeof(double);
+
+    double game_data[5] = {0.0, 0.0, 0.0, 0.0, 0.0};
+    // [ball.x, ball.y, other_paddle.y, p1 score incr, p2 score incr]
+
+    size_t vals_received;
+    socket.receive(&game_data, expected_size, vals_received);
+    if (vals_received != expected_size) {
+      throw std::runtime_error("ERROR: Game data recv not correct length.");
     }
+
+    std::cout << "Ball pos: " << game_data[0] << ", " << game_data[1] << std::endl;
 
     // Draw
     window.clear(sf::Color::Black);
@@ -134,15 +141,15 @@ int main() {
     window.draw(right_score_text);
 
     // draw ball
-    ball_shape.setPosition(ball.get_x(), ball.get_y());
+    ball_shape.setPosition(game_data[0], game_data[1]);
     window.draw(ball_shape);
 
     // draw paddles
-    paddle_shape.setPosition(left_paddle.get_x(), left_paddle.get_y());
+    paddle_shape.setPosition(10.0, game_data[2]);
     window.draw(paddle_shape);
-    paddle_shape.setPosition(right_paddle.get_x(),
-                             right_paddle.get_y());
-    window.draw(paddle_shape);
+//    paddle_shape.setPosition(right_paddle.get_x(),
+//                             right_paddle.get_y());
+//    window.draw(paddle_shape);
 
     window.display();
   }
