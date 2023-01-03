@@ -1,3 +1,6 @@
+#include <cmath>
+#include <iostream>
+
 #include "ball.h"
 #include "constants.h"
 
@@ -18,13 +21,28 @@ void Ball::update(const double dt) {
 }
 
 // DEBUG WITH MOUSE
-void Ball::update_mouse(const double x, const double y) {
+void Ball::set_pos(const double x, const double y) {
   pos_.x() = x;
   pos_.y() = y;
 }
 
 void Ball::collide(const Paddle& p) {
   const double y_dist = p.get_y() - pos_.y();
+  std::cout << "y dist: " << y_dist << std::endl;
 
-//  const double deflection_angle_ratio = x_dist
+  const double angle_ratio = (y_dist / constants::PADDLE_HEIGHT/2.0);
+  std::cout << "angle ratio: " << angle_ratio << std::endl;
+
+  double deflection_angle = angle_ratio * M_PI;
+  if (p.is_left()) {
+    deflection_angle *= -1;
+  } else {
+    deflection_angle += M_PI;
+  }
+
+  std::cout << "Deflection angle: " << deflection_angle * 180/M_PI << std::endl;
+
+  direction_.x() = std::cos(deflection_angle);
+  direction_.y() = std::sin(deflection_angle);
+  speed_ *= constants::BALL_SPEED_MULTIPLIER;
 }

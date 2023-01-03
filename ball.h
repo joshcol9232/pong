@@ -15,7 +15,7 @@ class Ball {
   Ball(Vector2d pos, double radius);
 
   void update(const double dt);
-  void update_mouse(const double x, const double y);
+  void set_pos(const double x, const double y);
   void collide(const Paddle& p);
 
   inline double get_x() const { return pos_.x(); }

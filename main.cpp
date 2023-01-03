@@ -23,7 +23,7 @@ int main() {
                                         constants::WINDOW_HEIGHT),
                           "Pong");
 
-  window.setFramerateLimit(15);
+  window.setFramerateLimit(60);
 
   // setup
   sf::CircleShape ball_shape(constants::BALL_RADIUS);
@@ -61,19 +61,17 @@ int main() {
     }
 
     // update
-//    ball.update(DT);
-    sf::Vector2i localPosition = sf::Mouse::getPosition(window);
-    ball.update_mouse(static_cast<double>(localPosition.x),
-                      static_cast<double>(localPosition.y));
+    ball.update(DT);
+
+    // debug with mouse
+//    sf::Vector2i localPosition = sf::Mouse::getPosition(window);
+//    ball.update_mouse(static_cast<double>(localPosition.x),
+//                      static_cast<double>(localPosition.y));
 
     if (left_paddle.check_collision(ball)) {
-      std::cout << "LEFT colliding" << std::endl;
       ball.collide(left_paddle);
     } else if (right_paddle.check_collision(ball)) {
-      std::cout << "RIGHT colliding" << std::endl;
       ball.collide(right_paddle);
-    } else {
-      std::cout << "None colliding..." << std::endl;
     }
 
     // Draw
