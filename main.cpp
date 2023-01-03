@@ -8,6 +8,8 @@
 #include "paddle.h"
 #include "constants.h"
 
+#define DT 1.0/60.0
+
 using Eigen::Vector2d;
 
 int main() {
@@ -24,8 +26,8 @@ int main() {
   // setup
   sf::CircleShape ball_shape(constants::BALL_RADIUS);
   ball_shape.setFillColor(sf::Color::White);
-  ball_shape.setOrigin(constants::BALL_RADIUS/2.0,
-                       constants::BALL_RADIUS/2.0);
+  ball_shape.setOrigin(constants::BALL_RADIUS,
+                       constants::BALL_RADIUS);
 
   sf::RectangleShape paddle_shape(sf::Vector2f(constants::PADDLE_WIDTH,
                                                constants::PADDLE_HEIGHT));
@@ -41,7 +43,25 @@ int main() {
       }
     }
 
-    ball.update(1.0/60.0);
+    // Process inputs
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
+      right_paddle.move(DT, false);
+    }
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
+      right_paddle.move(DT, true);
+    }
+
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
+      left_paddle.move(DT, false);
+    }
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
+      left_paddle.move(DT, true);
+    }
+
+    // update
+    ball.update(DT);
+
+    std::cout << "RIGHT: " << right_paddle.check_collision(ball) << std::endl;
 
     // Draw
     window.clear(sf::Color::Black);
@@ -50,10 +70,9 @@ int main() {
     window.draw(ball_shape);
 
     // draw paddles
-    paddle_shape.setPosition(constants::PADDLE_OFFSET, left_paddle.get_y());
+    paddle_shape.setPosition(left_paddle.get_x(), left_paddle.get_y());
     window.draw(paddle_shape);
-    paddle_shape.setPosition(constants::WINDOW_WIDTH -
-                             constants::PADDLE_OFFSET,
+    paddle_shape.setPosition(right_paddle.get_x(),
                              right_paddle.get_y());
     window.draw(paddle_shape);
 

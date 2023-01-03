@@ -2,9 +2,31 @@
 #include "constants.h"
 
 Paddle::Paddle(bool is_left) :
-  left_side_(is_left), y_pos_(constants::WINDOW_HEIGHT/2.0)
+  left_side_(is_left), y_pos_(constants::WINDOW_HEIGHT/2.0),
+  x_pos_([&]() -> const double {
+    return is_left ? constants::PADDLE_OFFSET :
+      constants::WINDOW_WIDTH - constants::PADDLE_OFFSET;
+  }())
 {}
 
 void Paddle::move(const double dt, const bool direction) {
-  y_pos_ += constants::PADDLE_SPEED * direction * dt;
+  const double dy = constants::PADDLE_SPEED *
+      (static_cast<double>(direction) * 2 - 1) * dt;
+
+  const bool above_bottom = y_pos_ + dy + constants::PADDLE_HEIGHT/2.0 <
+      static_cast<double>(constants::WINDOW_HEIGHT);
+
+  const bool below_top = y_pos_ + dy - constants::PADDLE_HEIGHT/2.0 > 0.0;
+
+  if (above_bottom && below_top) {
+    y_pos_ += dy;
+  }
+}
+
+bool Paddle::check_collision(const Ball& b) const {
+  const double dist_x = x_pos_ - b.get_x();
+  const double dist_y = y_pos_ - b.get_y();
+
+  return std::abs(dist_x) < constants::PADDLE_WIDTH &&
+      std::abs(dist_y) < constants::PADDLE_HEIGHT/2;
 }
