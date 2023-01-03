@@ -8,6 +8,7 @@
 #include "ball.h"
 #include "paddle.h"
 #include "constants.h"
+#include "msg_type.h"
 
 #define DT 1.0/60.0
 
@@ -108,27 +109,37 @@ int main() {
       ball.collide(right_paddle);
     }
 
-    constexpr size_t exptected_size = 5 * sizeof(double);
+    double left_data[5] = { ball.get_x(), ball.get_y(), right_paddle.get_y(), left_score_incr, right_score_incr };
 
-    // TODO: Send game data to left
-    double left_data[5] = {ball.get_x(), ball.get_y(),
-                           right_paddle.get_y(),
-                           left_score_incr, right_score_incr};
-
+    MessageType next = MessageType::GameData;
     size_t sent;
-    left_client.send(&left_data, exptected_size, sent);
-    if (sent != exptected_size) {
-      throw std::runtime_error("Error: Not sent 5 bits of data.");
+    left_client.send(&next, sizeof(int), sent);
+    if (sent != sizeof(int)) {
+      throw std::runtime_error("Error: Could not send message type.");
+    }
+    left_client.send(&left_data, sizeof(double) * 5, sent);
+    if (sent != sizeof(double) * 5) {
+      throw std::runtime_error("Error: Could not send game data.");
     }
 
-    double right_data[5] = {ball.get_x(), ball.get_y(),
-                           left_paddle.get_y(),
-                           left_score_incr, right_score_incr};
+    double right_data[5] {
+      constants::WINDOW_WIDTH - ball.get_x(),  // flip
+      ball.get_y(),
+      left_paddle.get_y(),
+      left_score_incr,
+      right_score_incr
+    };
 
-    right_client.send(&right_data, exptected_size, sent);
-    if (sent != exptected_size) {
-      throw std::runtime_error("Error: Not sent 5 bits of data.");
+    next = MessageType::GameData;
+    right_client.send(&next, sizeof(int), sent);
+    if (sent != sizeof(int)) {
+      throw std::runtime_error("Error: Could not send message type.");
     }
+    right_client.send(&right_data, sizeof(double) * 5, sent);
+    if (sent != sizeof(double) * 5) {
+      throw std::runtime_error("Error: Could not send game data.");
+    }
+
 
     sf::sleep(sf::milliseconds(1));
   }

@@ -21,6 +21,7 @@ class Ball {
 
   inline double get_x() const { return pos_.x(); }
   inline double get_y() const { return pos_.y(); }
+  inline const Vector2d& get_pos() const { return pos_; }
   inline double get_radius() const { return radius_; }
 
  private:

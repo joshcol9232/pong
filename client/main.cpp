@@ -8,12 +8,23 @@
 #include <Eigen/Dense>
 
 #include "constants.h"
+#include "msg_type.h"
 
 #define DT 1.0/60.0
 
 #define SERVER_IP "localhost"
 
 using Eigen::Vector2d;
+
+MessageType get_msg_type(sf::TcpSocket& socket) {
+  size_t recv;
+  int msg_type;
+  socket.receive(&msg_type, sizeof(int), recv);
+  if (recv != sizeof(int)) {
+    throw std::runtime_error("Error: Wrong num of bytes recieved.");
+  }
+  return static_cast<MessageType>(msg_type);
+}
 
 int main() {
   size_t left_score = 0;
@@ -72,6 +83,11 @@ int main() {
   std::cout << "Connected :) : " << socket.getRemoteAddress() << ":"
             << socket.getRemotePort() << std::endl;
 
+  // [ball.x, ball.y, enemy.y, left score incr, right score incr]
+#define GAME_DATA_SIZE 5
+  constexpr size_t expected_size = sizeof(double) * GAME_DATA_SIZE;
+  double game_data[GAME_DATA_SIZE] = {0, 0, 0, 0, 0};
+
   while (window.isOpen()) {
     sf::Event event;
     while (window.pollEvent(event)) {
@@ -121,18 +137,21 @@ int main() {
 //    }
 
     // Get positions from server
-    constexpr size_t expected_size = 5 * sizeof(double);
+    MessageType msg_type = get_msg_type(socket);
 
-    double game_data[5] = {0.0, 0.0, 0.0, 0.0, 0.0};
-    // [ball.x, ball.y, other_paddle.y, p1 score incr, p2 score incr]
+    if (msg_type == MessageType::GameData) {
+      std::cout << "Getting game data..." << std::endl;
 
-    size_t vals_received;
-    socket.receive(&game_data, expected_size, vals_received);
-    if (vals_received != expected_size) {
-      throw std::runtime_error("ERROR: Game data recv not correct length.");
+      // Collect game data
+      size_t recv;
+      socket.receive(&game_data, expected_size, recv);
+      if (recv != expected_size) {
+        throw std::runtime_error("Error: Failed to collect game data.");
+      }
+      std::cout << game_data[0] << ", " << game_data[1] << ", "
+                << game_data[2] << ", " << game_data[3] << ", "
+                << game_data[4] << std::endl;
     }
-
-    std::cout << "Ball pos: " << game_data[0] << ", " << game_data[1] << std::endl;
 
     // Draw
     window.clear(sf::Color::Black);
