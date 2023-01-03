@@ -32,6 +32,14 @@ void get_non_blocking_client(sf::TcpSocket& client, sf::TcpListener& listener) {
             << std::endl;
 }
 
+void send_message_type(sf::TcpSocket& client, MessageType m) {
+  size_t sent;
+  client.send(&m, sizeof(int), sent);
+  if (sent != sizeof(int)) {
+    throw std::runtime_error("Error: Could not send message type.");
+  }
+}
+
 }  // anonymous namespace
 
 int main() {
@@ -58,6 +66,10 @@ int main() {
   sf::TcpSocket left_client, right_client;
   get_non_blocking_client(left_client, listener);
   get_non_blocking_client(right_client, listener);
+
+  // client setup
+  send_message_type(left_client, MessageType::YouAreLeft);
+  send_message_type(right_client, MessageType::YouAreRight);
 
   sf::Clock deltaClock;
   bool stop = false;
@@ -111,12 +123,9 @@ int main() {
 
     double left_data[5] = { ball.get_x(), ball.get_y(), right_paddle.get_y(), left_score_incr, right_score_incr };
 
-    MessageType next = MessageType::GameData;
+    send_message_type(left_client, MessageType::GameData);
     size_t sent;
-    left_client.send(&next, sizeof(int), sent);
-    if (sent != sizeof(int)) {
-      throw std::runtime_error("Error: Could not send message type.");
-    }
+
     left_client.send(&left_data, sizeof(double) * 5, sent);
     if (sent != sizeof(double) * 5) {
       throw std::runtime_error("Error: Could not send game data.");
@@ -130,11 +139,7 @@ int main() {
       right_score_incr
     };
 
-    next = MessageType::GameData;
-    right_client.send(&next, sizeof(int), sent);
-    if (sent != sizeof(int)) {
-      throw std::runtime_error("Error: Could not send message type.");
-    }
+    send_message_type(right_client, MessageType::GameData);
     right_client.send(&right_data, sizeof(double) * 5, sent);
     if (sent != sizeof(double) * 5) {
       throw std::runtime_error("Error: Could not send game data.");

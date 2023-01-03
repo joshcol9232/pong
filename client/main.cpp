@@ -16,7 +16,7 @@
 
 using Eigen::Vector2d;
 
-MessageType get_msg_type(sf::TcpSocket& socket) {
+MessageType recv_msg_type(sf::TcpSocket& socket) {
   size_t recv;
   int msg_type;
   socket.receive(&msg_type, sizeof(int), recv);
@@ -83,6 +83,18 @@ int main() {
   std::cout << "Connected :) : " << socket.getRemoteAddress() << ":"
             << socket.getRemotePort() << std::endl;
 
+  bool is_left;
+  const MessageType m = recv_msg_type(socket);
+  if (m == MessageType::YouAreLeft) {
+    is_left = true;
+  } else if (m == MessageType::YouAreRight) {
+    is_left = false;
+  } else {
+    std::cerr << "Err: Got " << static_cast<int>(m) << " message type." << std::endl;
+    throw std::runtime_error("Error: Expected a YouAreLeft "
+                             "or YouAreRight message.");
+  }
+
   // [ball.x, ball.y, enemy.y, left score incr, right score incr]
 #define GAME_DATA_SIZE 5
   constexpr size_t expected_size = sizeof(double) * GAME_DATA_SIZE;
@@ -137,7 +149,7 @@ int main() {
 //    }
 
     // Get positions from server
-    MessageType msg_type = get_msg_type(socket);
+    MessageType msg_type = recv_msg_type(socket);
 
     if (msg_type == MessageType::GameData) {
       std::cout << "Getting game data..." << std::endl;
