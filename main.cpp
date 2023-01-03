@@ -1,4 +1,5 @@
 #include <iostream>
+#include <string>
 
 #include <SFML/Graphics.hpp>
 
@@ -41,9 +42,32 @@ int main() {
                                         constants::WINDOW_HEIGHT),
                           "Pong");
 
-  window.setFramerateLimit(60);
+//  window.setFramerateLimit(60);
+  sf::Clock deltaClock;
 
   // setup
+  sf::Font font;
+  // NOTE: Copy this fonts directory next to your executable
+  font.loadFromFile("./fonts/Hack-Bold.ttf");
+
+  sf::Text left_score_text;
+  left_score_text.setFont(font);
+  left_score_text.setString("0");
+  left_score_text.setPosition(sf::Vector2f(static_cast<float>
+                                            (constants::WINDOW_WIDTH)/4.0,
+                                           50.0));
+  left_score_text.setFillColor(sf::Color::White);
+  left_score_text.setCharacterSize(36);
+
+  sf::Text right_score_text;
+  right_score_text.setFont(font);
+  right_score_text.setString("0");
+  right_score_text.setPosition(sf::Vector2f(3 * static_cast<float>
+                                            (constants::WINDOW_WIDTH)/4.0,
+                                            50.0));
+  right_score_text.setFillColor(sf::Color::White);
+  right_score_text.setCharacterSize(36);
+
   sf::CircleShape ball_shape(constants::BALL_RADIUS);
   ball_shape.setFillColor(sf::Color::White);
   ball_shape.setOrigin(constants::BALL_RADIUS,
@@ -63,29 +87,32 @@ int main() {
       }
     }
 
+    sf::Time dt_Time = deltaClock.restart();
+    const double dt = static_cast<double>(dt_Time.asSeconds());
+
     // Process inputs
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
-      right_paddle.move(DT, false);
-    }
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
-      right_paddle.move(DT, true);
+      right_paddle.move(dt, false);
+    } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
+      right_paddle.move(dt, true);
     }
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
-      left_paddle.move(DT, false);
-    }
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
-      left_paddle.move(DT, true);
+      left_paddle.move(dt, false);
+    } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
+      left_paddle.move(dt, true);
     }
 
     // update
-    ball.update(DT);
+    ball.update(dt);
 
     if (check_goal(ball, true)) { // check left
-      ++left_score;
+      ++right_score;
+      right_score_text.setString(std::to_string(right_score));
       reset();
     } else if (check_goal(ball, false)) {
-      ++right_score;
+      ++left_score;
+      left_score_text.setString(std::to_string(left_score));
       reset();
     }
 
@@ -102,6 +129,10 @@ int main() {
 
     // Draw
     window.clear(sf::Color::Black);
+    // draw score
+    window.draw(left_score_text);
+    window.draw(right_score_text);
+
     // draw ball
     ball_shape.setPosition(ball.get_x(), ball.get_y());
     window.draw(ball_shape);

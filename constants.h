@@ -15,12 +15,12 @@ namespace constants {
 
   const double BALL_STARTING_SPEED = 200.0;
   const double BALL_RADIUS = 10.0;
-  const double BALL_SPEED_MULTIPLIER = 1.12;
+  const double BALL_SPEED_INCREMENT = 50.0;
 
   const double PADDLE_WIDTH = 15.0;
   const double PADDLE_HEIGHT = 150.0;
   const double PADDLE_OFFSET = PADDLE_WIDTH + 10.0;
-  const double PADDLE_SPEED = 500.0;
+  const double PADDLE_SPEED = 750.0;
 }  // namespace constants
 
 #endif // CONSTANTS_H

@@ -51,5 +51,5 @@ void Ball::collide(const Paddle& p) {
 
   direction_.x() = std::cos(deflection_angle);
   direction_.y() = std::sin(deflection_angle);
-  speed_ *= constants::BALL_SPEED_MULTIPLIER;
+  speed_ += constants::BALL_SPEED_INCREMENT;
 }
