@@ -3,7 +3,6 @@
 
 #include "paddle.h"
 #include "ball.h"
-#include "solver.h"
 #include <Eigen/Dense>
 
 using Eigen::Vector2d;
