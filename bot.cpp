@@ -1,6 +1,7 @@
 #include "bot.h"
 #include "constants.h"
 #include <iostream>
+#include <iomanip>
 
 Bot::Bot()
 {
@@ -35,10 +36,9 @@ double Bot::solve(const double x_pos,
                   const double radius,
                   Vector2d ball_direction,
                   const double target_x) const {
-  std::cout << "Bot::solve started..." << std::endl;
-
-  std::cout << "Bot::solve: INPUTS:" << std::endl
-            << "\tx_pos=" << x_pos << std::endl
+  std::cout << std::setprecision(2) << std::fixed << std::showpoint;
+  std::cout << "Bot::solve:\nInputs:" << std::endl
+            << "\tx_pos=" << x_pos
             << "\ty_pos=" << y_pos << std::endl
             << "\tball_dir_x=" << ball_direction.x() << std::endl
             << "\tball_dir_y=" << ball_direction.y() << std::endl
@@ -47,11 +47,12 @@ double Bot::solve(const double x_pos,
   const double m = ball_direction.y() / ball_direction.x();
   const double c = y_pos - m * x_pos;
 
-  std::cout << "Bot::solve: m=" << m << "\tc=" << c << std::endl;
+  std::cout << "Calc:" << std::endl;
+  std::cout << "\tm=" << m << "\tc=" << c << std::endl;
 
   // y of line at target_x
   const double y_result = m * target_x + c;
-  std::cout << "Bot::solve: y_result=" << y_result << std::endl;
+  std::cout << "\ty_result=" << y_result << std::endl;
 
   if (y_result < radius) {
     std::cout << "Bot::solve: wall collision..." << std::endl;
@@ -74,7 +75,7 @@ double Bot::solve(const double x_pos,
                  radius, ball_direction, target_x);
   }
 
-  std::cout << "Bot::solve finished.\t\r" << std::flush;
+  std::cout << "---------------------------------------" << std::endl;
 
   return y_result;
 }

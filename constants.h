@@ -2,6 +2,7 @@
 #define CONSTANTS_H
 
 #include <cstddef>
+#include <cmath>
 
 //#define DEBUG   // For debug output
 
@@ -13,11 +14,14 @@ namespace constants {
   const size_t WINDOW_WIDTH = 800;
   const size_t WINDOW_HEIGHT = 600;
 
-  const bool BOT_ONLY = false;
+  const double START_ANGLE_CLAMP = std::atan2(WINDOW_HEIGHT/2, WINDOW_WIDTH/2);
+
+  // Bot vs Bot?
+  const bool BOT_ONLY = true;
 
   const double BALL_START_SPEED = 350.0;
   const double BALL_RADIUS = 10.0;
-  const double BALL_SPEED_INCREMENT = 30.0;
+  const double BALL_SPEED_INCREMENT = 1000.0;
   const double HIT_RANDOM_LIM = 0.5;
   const double HIT_RANDOM_STD_DEV = 0.1;
 

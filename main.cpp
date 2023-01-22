@@ -75,7 +75,7 @@ int main() {
   ball_speed_text.setFont(font);
   ball_speed_text.setString(std::to_string(static_cast<int>(constants::BALL_START_SPEED)));
   ball_speed_text.setPosition(sf::Vector2f(static_cast<float>(constants::WINDOW_WIDTH)/2 - 32, 10.0));
-  ball_speed_text.setFillColor(sf::Color::White);
+  ball_speed_text.setFillColor(sf::Color::Red);
   ball_speed_text.setCharacterSize(16);
 
   sf::Text ball_max_speed_text;

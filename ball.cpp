@@ -29,7 +29,8 @@ double random_angle_normdist(const double min_a,
 }
 
 double random_start_angle() {
-  return random_angle(M_PI * -1.0/3.0, M_PI * 1.0/3.0);
+  return random_angle(-constants::START_ANGLE_CLAMP,
+                      constants::START_ANGLE_CLAMP);
 }
 
 }
@@ -39,10 +40,9 @@ Ball::Ball(Vector2d pos, double radius) :
   speed_(constants::BALL_START_SPEED)
 {
   const double angle = random_start_angle();
-  std::cout << "ANGLE: " << angle << std::endl;
 
-  direction_.x() = cos(angle);
-  direction_.y() = sin(angle);
+  direction_.x() = std::cos(angle);
+  direction_.y() = std::sin(angle);
 }
 
 void Ball::update(const double dt) {
