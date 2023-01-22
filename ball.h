@@ -2,6 +2,7 @@
 #define BALL_H
 
 #include <Eigen/Dense>
+#include <random>
 
 #include "paddle.h"
 #include "collisionidentifier.h"
@@ -33,6 +34,8 @@ class Ball {
   double radius_;
   Vector2d direction_;  // Unit vector
   CollisionIdentifier last_collided_with_;
+
+  std::uniform_real_distribution<double> rand_dist_;
 };
 
 #endif // BALL_H

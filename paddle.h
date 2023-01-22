@@ -15,8 +15,9 @@ public:
   void reset();
   void increase_speed();
 
-  const double get_x() const { return x_pos_; }
-  const double get_y() const { return y_pos_; }
+  inline double get_x() const { return x_pos_; }
+  inline double get_y() const { return y_pos_; }
+  inline double get_speed() const { return speed_; }
 
   bool check_collision(const Ball& b) const;
 

@@ -3,12 +3,16 @@
 #include "ball.h"
 #include "constants.h"
 
-Ball::Ball() {}
+Ball::Ball() : rand_dist_(-M_PI/2, M_PI/2) {}
 
 Ball::Ball(Vector2d pos, double radius) :
-    pos_(pos), radius_(radius), speed_(constants::BALL_START_SPEED),
-    direction_(Vector2d(1.0, 0.0))
-{}
+    pos_(pos), radius_(radius), speed_(constants::BALL_START_SPEED), rand_dist_(-M_PI/2, M_PI/2)
+{
+  std::default_random_engine generator;
+  const double angle = rand_dist_(generator);
+  direction_.x() = cos(angle);
+  direction_.y() = sin(angle);
+}
 
 void Ball::update(const double dt) {
   pos_ += direction_ * speed_ * dt;
@@ -39,8 +43,11 @@ void Ball::reset() {
           constants::WINDOW_HEIGHT/2);
 
   speed_ = constants::BALL_START_SPEED;
-  direction_.x() = 1.0;   // Prevent errors with /0
-  direction_.y() = 0.0;
+
+  std::default_random_engine generator;
+  const double angle = rand_dist_(generator);
+  direction_.x() = cos(angle);
+  direction_.y() = sin(angle);
 }
 
 void Ball::collide(const Paddle& p) {

@@ -8,12 +8,25 @@ Bot::Bot()
 }
 
 void Bot::update(const double dt, Paddle* target_paddle) const {
-  if(current_target_y_ < target_paddle->get_y()) {
+  const double y = target_paddle->get_y();
+
+  if (current_target_y_ == y) return;
+
+  const double dy = dt * target_paddle->get_speed();
+  double dt_rel = dt;
+
+  if(current_target_y_ < y) {
     // Move up
-    target_paddle->move(dt, false);
+    if (y - dy < current_target_y_) {  // Precise movement
+      dt_rel = dy / target_paddle->get_speed();
+    }
+    target_paddle->move(dt_rel, false);
   } else {
     // Move down
-    target_paddle->move(dt, true);
+    if (y + dy > current_target_y_) {  // Precise movement
+      dt_rel = dy / target_paddle->get_speed();
+    }
+    target_paddle->move(dt_rel, true);
   }
 }
 
