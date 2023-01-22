@@ -57,20 +57,22 @@ double Bot::solve(const double x_pos,
   if (y_result < radius) {
     std::cout << "Bot::solve: wall collision..." << std::endl;
     // Get position of collision with wall
-    // When y = 0
-    const double x_col = -c / m;
+    // When y = radius
+    const double x_col = (radius - c) / m;
     // reverse y direction
     ball_direction.y() *= -1;
-    return solve(x_col, 0.0, radius, ball_direction, target_x);
+    return solve(x_col, radius, radius, ball_direction, target_x);
 
   } else if (y_result > constants::WINDOW_HEIGHT - radius) { // collision
     std::cout << "Bot::solve: wall collision..." << std::endl;
     // Get position of collision with wall
-    // When y = constants::WINDOW_HEIGHT
-    const double x_col = (constants::WINDOW_HEIGHT - c) / m;
+    // When y = constants::WINDOW_HEIGHT - radius
+    const double x_col = (constants::WINDOW_HEIGHT - radius - c) / m;
     // reverse y direction
     ball_direction.y() *= -1;
-    return solve(x_col, constants::WINDOW_HEIGHT, radius, ball_direction, target_x);
+    return solve(x_col,
+                 constants::WINDOW_HEIGHT - radius,
+                 radius, ball_direction, target_x);
   }
 
   std::cout << "Bot::solve finished." << std::endl;

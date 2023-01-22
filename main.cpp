@@ -117,7 +117,7 @@ int main() {
     const double dt = static_cast<double>(dt_Time.asSeconds());
 
     // update BOT
-//    bot.update(dt, target_paddle);
+    bot.update(dt, target_paddle);
 
     // Process inputs
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
