@@ -1,4 +1,4 @@
-# Pong
+# (Self-playing) Pong
 
-SFML pong
+SFML pong with ~100% accurate bot
 
