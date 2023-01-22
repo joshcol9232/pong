@@ -6,7 +6,7 @@
 Ball::Ball() {}
 
 Ball::Ball(Vector2d pos, double radius) :
-    pos_(pos), radius_(radius), speed_(constants::BALL_STARTING_SPEED),
+    pos_(pos), radius_(radius), speed_(constants::BALL_START_SPEED),
     direction_(Vector2d(1.0, 0.0))
 {}
 
@@ -14,8 +14,17 @@ void Ball::update(const double dt) {
   pos_ += direction_ * speed_ * dt;
 
   // wall bouncing
-  if (pos_.y() < radius_ || pos_.y() > constants::WINDOW_HEIGHT - radius_) {
+  if ((pos_.y() < radius_ && last_collided_with_ != CollisionIdentifier::BottomWall) ||
+      (pos_.y() > constants::WINDOW_HEIGHT - radius_ &&
+       last_collided_with_ != CollisionIdentifier::TopWall)) {
+
     direction_.y() *= -1;
+
+    if (pos_.y() < radius_) {
+      last_collided_with_ = CollisionIdentifier::BottomWall;
+    } else {
+      last_collided_with_ = CollisionIdentifier::TopWall;
+    }
   }
 }
 
@@ -29,8 +38,8 @@ void Ball::reset() {
   set_pos(constants::WINDOW_WIDTH/2,
           constants::WINDOW_HEIGHT/2);
 
-  speed_ = constants::BALL_STARTING_SPEED;
-  direction_.x() = 1.0;
+  speed_ = constants::BALL_START_SPEED;
+  direction_.x() = 1.0;   // Prevent errors with /0
   direction_.y() = 0.0;
 }
 
@@ -45,11 +54,16 @@ void Ball::collide(const Paddle& p) {
     deflection_angle += M_PI;
   }
 
+  last_collided_with_ = p.collision_id();
+
 #ifdef DEBUG
   std::cout << "Deflection angle: " << deflection_angle * 180/M_PI << std::endl;
 #endif
 
   direction_.x() = std::cos(deflection_angle);
   direction_.y() = std::sin(deflection_angle);
+}
+
+void Ball::increase_speed() {
   speed_ += constants::BALL_SPEED_INCREMENT;
 }

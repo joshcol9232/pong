@@ -8,6 +8,7 @@
 #include "ball.h"
 #include "paddle.h"
 #include "constants.h"
+#include "bot.h"
 
 #define DT 1.0/60.0
 
@@ -18,6 +19,12 @@ namespace {
 inline bool check_goal(const Ball& b, bool check_left) {
   return (check_left && b.get_x() < 0.0) ||
       (!check_left && b.get_x() > constants::WINDOW_WIDTH);
+}
+
+inline void increase_speed(Ball& b, Paddle& left, Paddle& right) {
+  b.increase_speed();
+  left.increase_speed();
+  right.increase_speed();
 }
 
 }  // anonymous namespace
@@ -32,12 +39,6 @@ int main() {
   size_t left_score = 0;
   size_t right_score = 0;
 
-  auto reset = [&]() {
-    left_paddle.reset();
-    right_paddle.reset();
-    ball.reset();
-  };
-
   sf::RenderWindow window(sf::VideoMode(constants::WINDOW_WIDTH,
                                         constants::WINDOW_HEIGHT),
                           "Pong");
@@ -48,7 +49,7 @@ int main() {
   // setup
   sf::Font font;
   // NOTE: Copy this fonts directory next to your executable
-  font.loadFromFile("./fonts/Hack-Bold.ttf");
+  font.loadFromFile("/home/josh/programming/cpp/pong/fonts/Hack-Bold.ttf");
 
   sf::Text left_score_text;
   left_score_text.setFont(font);
@@ -68,6 +69,14 @@ int main() {
   right_score_text.setFillColor(sf::Color::White);
   right_score_text.setCharacterSize(36);
 
+  sf::Text ball_speed_text;
+  ball_speed_text.setFont(font);
+  ball_speed_text.setString(std::to_string(static_cast<int>(constants::BALL_START_SPEED)));
+  ball_speed_text.setPosition(sf::Vector2f(static_cast<float>(constants::WINDOW_WIDTH)/2 - 24, 10.0));
+  ball_speed_text.setFillColor(sf::Color::White);
+  ball_speed_text.setCharacterSize(24);
+
+
   sf::CircleShape ball_shape(constants::BALL_RADIUS);
   ball_shape.setFillColor(sf::Color::White);
   ball_shape.setOrigin(constants::BALL_RADIUS,
@@ -79,6 +88,23 @@ int main() {
   paddle_shape.setOrigin(constants::PADDLE_WIDTH/2.0,
                          constants::PADDLE_HEIGHT/2.0);
 
+
+  bool lefts_turn = false;   // left's turn to shoot?
+  Paddle* target_paddle = &right_paddle;
+  Bot bot;
+  bot.change_target(ball, lefts_turn);
+
+  auto reset = [&]() {
+    left_paddle.reset();
+    right_paddle.reset();
+    ball.reset();
+    ball_speed_text.setString(std::to_string(static_cast<int>(constants::BALL_START_SPEED)));
+    lefts_turn = false;
+    target_paddle = &right_paddle;
+    bot.change_target(ball, lefts_turn);
+  };
+
+
   while (window.isOpen()) {
     sf::Event event;
     while (window.pollEvent(event)) {
@@ -89,6 +115,9 @@ int main() {
 
     sf::Time dt_Time = deltaClock.restart();
     const double dt = static_cast<double>(dt_Time.asSeconds());
+
+    // update BOT
+//    bot.update(dt, target_paddle);
 
     // Process inputs
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
@@ -107,10 +136,12 @@ int main() {
     ball.update(dt);
 
     if (check_goal(ball, true)) { // check left
+      std::cout << "GOAL! ball_pos_y=" << ball.get_y() << std::endl;
       ++right_score;
       right_score_text.setString(std::to_string(right_score));
       reset();
     } else if (check_goal(ball, false)) {
+      std::cout << "GOAL! ball_pos_y=" << ball.get_y() << std::endl;
       ++left_score;
       left_score_text.setString(std::to_string(left_score));
       reset();
@@ -121,17 +152,30 @@ int main() {
 //    ball.update_mouse(static_cast<double>(localPosition.x),
 //                      static_cast<double>(localPosition.y));
 
-    if (left_paddle.check_collision(ball)) {
+    if (lefts_turn && left_paddle.check_collision(ball)) {
       ball.collide(left_paddle);
-    } else if (right_paddle.check_collision(ball)) {
+      increase_speed(ball, left_paddle, right_paddle);
+      ball_speed_text.setString(std::to_string(static_cast<int>(ball.get_speed())));
+      lefts_turn = false;
+
+      target_paddle = &right_paddle;
+      bot.change_target(ball, lefts_turn);
+    } else if (!lefts_turn && right_paddle.check_collision(ball)) {
       ball.collide(right_paddle);
+      increase_speed(ball, left_paddle, right_paddle);
+      ball_speed_text.setString(std::to_string(static_cast<int>(ball.get_speed())));
+      lefts_turn = true;
+
+      target_paddle = &left_paddle;
+      bot.change_target(ball, lefts_turn);
     }
 
     // Draw
     window.clear(sf::Color::Black);
-    // draw score
+    // draw text
     window.draw(left_score_text);
     window.draw(right_score_text);
+    window.draw(ball_speed_text);
 
     // draw ball
     ball_shape.setPosition(ball.get_x(), ball.get_y());
