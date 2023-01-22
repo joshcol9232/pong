@@ -30,6 +30,7 @@ inline void increase_speed(Ball& b, Paddle& left, Paddle& right) {
 }  // anonymous namespace
 
 int main() {
+  // setup
   Ball ball(Vector2d(constants::WINDOW_WIDTH/2, constants::WINDOW_HEIGHT/2),
             constants::BALL_RADIUS);
 
@@ -46,7 +47,8 @@ int main() {
 //  window.setFramerateLimit(60);
   sf::Clock deltaClock;
 
-  // setup
+
+  // ------ SET up text ------
   sf::Font font;
   // NOTE: Copy this fonts directory next to your executable
   font.loadFromFile("/home/josh/programming/cpp/pong/fonts/Hack-Bold.ttf");
@@ -72,10 +74,20 @@ int main() {
   sf::Text ball_speed_text;
   ball_speed_text.setFont(font);
   ball_speed_text.setString(std::to_string(static_cast<int>(constants::BALL_START_SPEED)));
-  ball_speed_text.setPosition(sf::Vector2f(static_cast<float>(constants::WINDOW_WIDTH)/2 - 24, 10.0));
+  ball_speed_text.setPosition(sf::Vector2f(static_cast<float>(constants::WINDOW_WIDTH)/2 - 32, 10.0));
   ball_speed_text.setFillColor(sf::Color::White);
-  ball_speed_text.setCharacterSize(24);
+  ball_speed_text.setCharacterSize(16);
 
+  sf::Text ball_max_speed_text;
+  ball_max_speed_text.setFont(font);
+  ball_max_speed_text.setString("Max speed: " + std::to_string(static_cast<int>(constants::BALL_START_SPEED)));
+  ball_max_speed_text.setPosition(10.0, 10.0);
+  ball_max_speed_text.setFillColor(sf::Color::White);
+  ball_max_speed_text.setCharacterSize(16);
+
+  // -------------------------
+
+  // ------ Set up sprites ------
 
   sf::CircleShape ball_shape(constants::BALL_RADIUS);
   ball_shape.setFillColor(sf::Color::White);
@@ -88,11 +100,14 @@ int main() {
   paddle_shape.setOrigin(constants::PADDLE_WIDTH/2.0,
                          constants::PADDLE_HEIGHT/2.0);
 
+  // ----------------------------
 
   bool lefts_turn = false;   // left's turn to shoot?
   Paddle* target_paddle = &right_paddle;
   Bot bot;
   bot.change_target(ball, lefts_turn);
+
+  double ball_max_speed = ball.get_speed();
 
   auto reset = [&]() {
     left_paddle.reset();
@@ -104,6 +119,13 @@ int main() {
     bot.change_target(ball, lefts_turn);
   };
 
+  auto update_speed_text = [&]() {
+    ball_speed_text.setString(std::to_string(static_cast<int>(ball.get_speed())));
+    if (ball.get_speed() > ball_max_speed) {
+      ball_max_speed = ball.get_speed();
+      ball_max_speed_text.setString("Max speed: " + std::to_string(static_cast<int>(ball_max_speed)));
+    }
+  };
 
   while (window.isOpen()) {
     sf::Event event;
@@ -153,20 +175,22 @@ int main() {
 //                      static_cast<double>(localPosition.y));
 
     if (lefts_turn && left_paddle.check_collision(ball)) {
-      ball.collide(left_paddle);
+      ball.collide(left_paddle, constants::BOT_ONLY);
       increase_speed(ball, left_paddle, right_paddle);
-      ball_speed_text.setString(std::to_string(static_cast<int>(ball.get_speed())));
       lefts_turn = false;
+
+      update_speed_text();
 
       if (constants::BOT_ONLY) {
         target_paddle = &right_paddle;
       }
       bot.change_target(ball, lefts_turn);
     } else if (!lefts_turn && right_paddle.check_collision(ball)) {
-      ball.collide(right_paddle);
+      ball.collide(right_paddle, true);
       increase_speed(ball, left_paddle, right_paddle);
-      ball_speed_text.setString(std::to_string(static_cast<int>(ball.get_speed())));
       lefts_turn = true;
+
+      update_speed_text();
 
       if (constants::BOT_ONLY) {
         target_paddle = &left_paddle;
@@ -180,6 +204,7 @@ int main() {
     window.draw(left_score_text);
     window.draw(right_score_text);
     window.draw(ball_speed_text);
+    window.draw(ball_max_speed_text);
 
     // draw ball
     ball_shape.setPosition(ball.get_x(), ball.get_y());

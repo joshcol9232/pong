@@ -1,5 +1,6 @@
 #include <cmath>
 #include <iostream>
+#include <algorithm>
 
 #include "ball.h"
 #include "constants.h"
@@ -14,8 +15,21 @@ double random_angle(const double low, const double high) {
   return distribute(generator);
 }
 
+double random_angle_normdist(const double min_a,
+                             const double max_a,
+                             const double std_dev) {
+  std::random_device os_seed;
+  const auto seed = os_seed();
+  std::mt19937 generator(seed);
+  std::normal_distribution<double> distribute(0, std_dev);
+
+  const double a = distribute(generator);
+
+  return std::clamp(a, min_a, max_a);
+}
+
 double random_start_angle() {
-  return random_angle(0, M_PI) - M_PI/2;
+  return random_angle(M_PI * -1.0/3.0, M_PI * 1.0/3.0);
 }
 
 }
@@ -67,14 +81,18 @@ void Ball::reset() {
   direction_.y() = sin(angle);
 }
 
-void Ball::collide(const Paddle& p) {
+void Ball::collide(const Paddle& p, const bool bot) {
   const double y_dist = p.get_y() - pos_.y();
   const double angle_ratio = y_dist / constants::PADDLE_HEIGHT/2.0;
 
   double deflection_angle = angle_ratio * M_PI;
 
-  // ADD RANDOMNESS
-  deflection_angle += random_angle(-constants::HIT_RANDOM_LIM, constants::HIT_RANDOM_LIM);
+  // ADD RANDOMNESS (if bot)
+  if (bot) {
+    deflection_angle += random_angle_normdist(-constants::HIT_RANDOM_LIM,
+                                              constants::HIT_RANDOM_LIM,
+                                              constants::HIT_RANDOM_STD_DEV);
+  }
 
   if (p.is_left()) {
     deflection_angle *= -1;
@@ -83,10 +101,6 @@ void Ball::collide(const Paddle& p) {
   }
 
   last_collided_with_ = p.collision_id();
-
-#ifdef DEBUG
-  std::cout << "Deflection angle: " << deflection_angle * 180/M_PI << std::endl;
-#endif
 
   direction_.x() = std::cos(deflection_angle);
   direction_.y() = std::sin(deflection_angle);

@@ -17,7 +17,7 @@ class Ball {
 
   void update(const double dt);
   void set_pos(const double x, const double y);
-  void collide(const Paddle& p);
+  void collide(const Paddle& p, const bool bot);
   void reset();
   void increase_speed();
 
