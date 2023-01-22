@@ -13,7 +13,6 @@ class Paddle;  // declare
 
 class Ball {
  public:
-  Ball();
   Ball(Vector2d pos, double radius);
 
   void update(const double dt);
@@ -34,8 +33,6 @@ class Ball {
   double radius_;
   Vector2d direction_;  // Unit vector
   CollisionIdentifier last_collided_with_;
-
-  std::uniform_real_distribution<double> rand_dist_;
 };
 
 #endif // BALL_H

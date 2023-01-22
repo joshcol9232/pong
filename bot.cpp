@@ -98,10 +98,19 @@ void Bot::change_target(const Ball& b, const bool lefts_turn) {
   if (lefts_turn) {
     // Find intersection with left wall
     // x = 0
-    current_target_y_ = solve(b.get_x(), b.get_y(), b.get_radius(), ball_direction, 0.0);
+    current_target_y_ = solve(b.get_x(),
+                              b.get_y(),
+                              b.get_radius(),
+                              ball_direction,
+                              constants::PADDLE_OFFSET + constants::PADDLE_WIDTH/2);
   } else {    // moving right
     // right wall
     // x = WINDOW_WIDTH
-    current_target_y_ = solve(b.get_x(), b.get_y(), b.get_radius(), ball_direction, constants::WINDOW_WIDTH);
+    current_target_y_ = solve(b.get_x(),
+                              b.get_y(),
+                              b.get_radius(),
+                              ball_direction,
+                              constants::WINDOW_WIDTH -
+                              (constants::PADDLE_OFFSET + constants::PADDLE_WIDTH/2));
   }
 }

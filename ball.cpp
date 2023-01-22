@@ -1,15 +1,32 @@
 #include <cmath>
+#include <iostream>
 
 #include "ball.h"
 #include "constants.h"
 
-Ball::Ball() : rand_dist_(-M_PI/2, M_PI/2) {}
+namespace {
+
+double random_angle(const double low, const double high) {
+  std::random_device os_seed;
+  const auto seed = os_seed();
+  std::mt19937 generator(seed);
+  std::uniform_real_distribution<double> distribute(low, high);
+  return distribute(generator);
+}
+
+double random_start_angle() {
+  return random_angle(0, M_PI) - M_PI/2;
+}
+
+}
 
 Ball::Ball(Vector2d pos, double radius) :
-    pos_(pos), radius_(radius), speed_(constants::BALL_START_SPEED), rand_dist_(-M_PI/2, M_PI/2)
+  pos_(pos), radius_(radius),
+  speed_(constants::BALL_START_SPEED)
 {
-  std::default_random_engine generator;
-  const double angle = rand_dist_(generator);
+  const double angle = random_start_angle();
+  std::cout << "ANGLE: " << angle << std::endl;
+
   direction_.x() = cos(angle);
   direction_.y() = sin(angle);
 }
@@ -44,8 +61,8 @@ void Ball::reset() {
 
   speed_ = constants::BALL_START_SPEED;
 
-  std::default_random_engine generator;
-  const double angle = rand_dist_(generator);
+  const double angle = random_start_angle();
+  std::cout << "ANGLE: " << angle << std::endl;
   direction_.x() = cos(angle);
   direction_.y() = sin(angle);
 }
@@ -55,6 +72,10 @@ void Ball::collide(const Paddle& p) {
   const double angle_ratio = y_dist / constants::PADDLE_HEIGHT/2.0;
 
   double deflection_angle = angle_ratio * M_PI;
+
+  // ADD RANDOMNESS
+  deflection_angle += random_angle(-constants::HIT_RANDOM_LIM, constants::HIT_RANDOM_LIM);
+
   if (p.is_left()) {
     deflection_angle *= -1;
   } else {

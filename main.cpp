@@ -158,7 +158,9 @@ int main() {
       ball_speed_text.setString(std::to_string(static_cast<int>(ball.get_speed())));
       lefts_turn = false;
 
-      target_paddle = &right_paddle;
+      if (constants::BOT_ONLY) {
+        target_paddle = &right_paddle;
+      }
       bot.change_target(ball, lefts_turn);
     } else if (!lefts_turn && right_paddle.check_collision(ball)) {
       ball.collide(right_paddle);
@@ -166,8 +168,10 @@ int main() {
       ball_speed_text.setString(std::to_string(static_cast<int>(ball.get_speed())));
       lefts_turn = true;
 
-      target_paddle = &left_paddle;
-      bot.change_target(ball, lefts_turn);
+      if (constants::BOT_ONLY) {
+        target_paddle = &left_paddle;
+        bot.change_target(ball, lefts_turn);
+      }
     }
 
     // Draw
