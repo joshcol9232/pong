@@ -85,6 +85,14 @@ int main() {
   ball_max_speed_text.setFillColor(sf::Color::White);
   ball_max_speed_text.setCharacterSize(16);
 
+
+  sf::Text fps_text;
+  fps_text.setFont(font);
+  fps_text.setString("0");
+  fps_text.setPosition(constants::WINDOW_WIDTH - 60.0, 10.0);
+  fps_text.setFillColor(sf::Color::Green);
+  fps_text.setCharacterSize(12);
+
   // -------------------------
 
   // ------ Set up sprites ------
@@ -205,6 +213,10 @@ int main() {
     window.draw(right_score_text);
     window.draw(ball_speed_text);
     window.draw(ball_max_speed_text);
+
+    // fps text
+    fps_text.setString(std::to_string(1.0/dt));
+    window.draw(fps_text);
 
     // draw ball
     ball_shape.setPosition(ball.get_x(), ball.get_y());
