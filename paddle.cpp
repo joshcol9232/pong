@@ -1,5 +1,6 @@
 #include "paddle.h"
 #include "constants.h"
+#include "ball.h"
 
 Paddle::Paddle(bool is_left) :
   left_side_(is_left), y_pos_(constants::WINDOW_HEIGHT/2.0),

@@ -147,7 +147,8 @@ int main() {
     const double dt = static_cast<double>(dt_Time.asSeconds());
 
     // update BOT
-    bot.update(dt, target_paddle);
+    if (constants::BOTS > 0)
+      bot.update(dt, target_paddle);
 
     // Process inputs
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
@@ -183,13 +184,13 @@ int main() {
 //                      static_cast<double>(localPosition.y));
 
     if (lefts_turn && left_paddle.check_collision(ball)) {
-      ball.collide(left_paddle, constants::BOT_ONLY);
+      ball.collide(left_paddle, constants::BOTS == 2);
       increase_speed(ball, left_paddle, right_paddle);
       lefts_turn = false;
 
       update_speed_text();
 
-      if (constants::BOT_ONLY) {
+      if (constants::BOTS > 0) {
         target_paddle = &right_paddle;
       }
       bot.change_target(ball, lefts_turn);
@@ -200,7 +201,7 @@ int main() {
 
       update_speed_text();
 
-      if (constants::BOT_ONLY) {
+      if (constants::BOTS == 2) {
         target_paddle = &left_paddle;
         bot.change_target(ball, lefts_turn);
       }

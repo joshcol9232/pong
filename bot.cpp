@@ -14,20 +14,21 @@ void Bot::update(const double dt, Paddle* target_paddle) const {
   if (current_target_y_ == y) return;
 
   const double dy = dt * target_paddle->get_speed();
-  double dt_rel = dt;
 
   if(current_target_y_ < y) {
     // Move up
     if (y - dy < current_target_y_) {  // Precise movement
-      dt_rel = (current_target_y_ - y) / target_paddle->get_speed();
+      target_paddle->y_pos_ = current_target_y_;
+    } else {
+      target_paddle->move(dt, false);
     }
-    target_paddle->move(dt_rel, false);
   } else {
     // Move down
     if (y + dy > current_target_y_) {  // Precise movement
-      dt_rel = (current_target_y_ - y) / target_paddle->get_speed();
+      target_paddle->y_pos_ = current_target_y_;
+    } else {
+      target_paddle->move(dt, true);
     }
-    target_paddle->move(dt_rel, true);
   }
 }
 

@@ -2,7 +2,6 @@
 #define PADDLE_H
 
 #include "collisionidentifier.h"
-#include "ball.h"
 
 class Ball;
 
@@ -23,7 +22,11 @@ public:
 
   CollisionIdentifier collision_id() const;
 
+  friend class Bot;
+
 private:
+  void set_y(const double y) { y_pos_ = y; };
+
   bool left_side_;  // left = true, right = false
   double y_pos_;    // Position of centre of paddle
   const double x_pos_;
