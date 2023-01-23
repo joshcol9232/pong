@@ -21,9 +21,9 @@ namespace constants {
   // 2 = both bots
   const char BOTS = 2;
 
-  const double BALL_START_SPEED = 3500.0;
+  const double BALL_START_SPEED = 1000.0;
   const double BALL_RADIUS = 10.0;
-  const double BALL_SPEED_INCREMENT = 50.0;
+  const double BALL_SPEED_INCREMENT = 0.0;
   const double HIT_RANDOM_LIM = 0.5;
   const double HIT_RANDOM_STD_DEV = 0.1;
 
