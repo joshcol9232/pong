@@ -15,14 +15,10 @@ void Paddle::move(const double dt, const bool direction) {
   const double dy = speed_ *
       (static_cast<double>(direction) * 2 - 1) * dt;
 
-  const bool above_bottom = y_pos_ + dy + constants::PADDLE_HEIGHT/2.0 <
-      static_cast<double>(constants::WINDOW_HEIGHT);
-
-  const bool below_top = y_pos_ + dy - constants::PADDLE_HEIGHT/2.0 > 0.0;
-
-  if (above_bottom && below_top) {
-    y_pos_ += dy;
-  }
+  y_pos_ += dy;
+  y_pos_ = std::clamp(y_pos_,
+                      constants::PADDLE_HEIGHT/2,
+                      constants::WINDOW_HEIGHT - constants::PADDLE_HEIGHT/2);
 }
 
 bool Paddle::check_collision(const Ball& b) const {
@@ -47,4 +43,10 @@ CollisionIdentifier Paddle::collision_id() const {
     return CollisionIdentifier::LeftPaddle;
   else
     return CollisionIdentifier::RightPaddle;
+}
+
+void Paddle::set_y(const double y) {
+  y_pos_ = std::clamp(y,
+                      constants::PADDLE_HEIGHT/2,
+                      constants::WINDOW_HEIGHT - constants::PADDLE_HEIGHT/2);
 }
