@@ -10,6 +10,10 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(SFML 2.5.1 COMPONENTS system graphics audio network REQUIRED)
 find_package(Eigen3 3.4.0 REQUIRED)
 
+configure_file(${CMAKE_SOURCE_DIR}/fonts/Hack-Bold.ttf
+               ${CMAKE_CURRENT_BINARY_DIR}/Hack-Bold.ttf
+               COPYONLY)
+
 add_executable(pong main.cpp
                constants.h
                ball.h ball.cpp

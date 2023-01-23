@@ -51,7 +51,7 @@ int main() {
   // ------ SET up text ------
   sf::Font font;
   // NOTE: Copy this fonts directory next to your executable
-  font.loadFromFile("/home/josh/programming/cpp/pong/fonts/Hack-Bold.ttf");
+  font.loadFromFile("./Hack-Bold.ttf");
 
   sf::Text left_score_text;
   left_score_text.setFont(font);

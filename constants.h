@@ -19,9 +19,9 @@ namespace constants {
   // 0 = two humans
   // 1 = left -> human, right -> bot
   // 2 = both bots
-  const char BOTS = 1;
+  const char BOTS = 2;
 
-  const double BALL_START_SPEED = 350.0;
+  const double BALL_START_SPEED = 3500.0;
   const double BALL_RADIUS = 10.0;
   const double BALL_SPEED_INCREMENT = 50.0;
   const double HIT_RANDOM_LIM = 0.5;
