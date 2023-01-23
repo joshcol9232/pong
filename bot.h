@@ -3,6 +3,7 @@
 
 #include "paddle.h"
 #include "ball.h"
+#include <random>
 #include <Eigen/Dense>
 
 using Eigen::Vector2d;
@@ -22,6 +23,7 @@ class Bot {
                const double target_x) const;
 
   double current_target_y_;
+  std::mt19937 rand_generator_;
 };
 
 #endif // BOT_H

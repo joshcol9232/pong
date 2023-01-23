@@ -184,7 +184,7 @@ int main() {
 //                      static_cast<double>(localPosition.y));
 
     if (lefts_turn && left_paddle.check_collision(ball)) {
-      ball.collide(left_paddle, constants::BOTS == 2);
+      ball.collide(left_paddle);
       increase_speed(ball, left_paddle, right_paddle);
       lefts_turn = false;
 
@@ -195,7 +195,7 @@ int main() {
       }
       bot.change_target(ball, lefts_turn);
     } else if (!lefts_turn && right_paddle.check_collision(ball)) {
-      ball.collide(right_paddle, true);
+      ball.collide(right_paddle);
       increase_speed(ball, left_paddle, right_paddle);
       lefts_turn = true;
 

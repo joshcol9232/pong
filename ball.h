@@ -2,7 +2,6 @@
 #define BALL_H
 
 #include <Eigen/Dense>
-#include <random>
 
 #include "paddle.h"
 #include "collisionidentifier.h"
@@ -17,7 +16,7 @@ class Ball {
 
   void update(const double dt);
   void set_pos(const double x, const double y);
-  void collide(const Paddle& p, const bool bot);
+  void collide(const Paddle& p);
   void reset();
   void increase_speed();
 

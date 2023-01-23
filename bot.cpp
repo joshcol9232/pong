@@ -3,9 +3,10 @@
 #include <iostream>
 #include <iomanip>
 
-Bot::Bot()
-{
-
+Bot::Bot(){
+  std::random_device os_seed;
+  const auto seed = os_seed();
+  rand_generator_ = std::mt19937(seed);
 }
 
 void Bot::update(const double dt, Paddle* target_paddle) const {
@@ -84,18 +85,21 @@ double Bot::solve(const double x_pos,
 void Bot::change_target(const Ball& b, const bool lefts_turn) {
   const auto& ball_direction = b.get_direction();
 
-  const double leading_paddle_edge = constants::PADDLE_OFFSET +
-                                     constants::PADDLE_WIDTH/2;
+  double target_x = constants::PADDLE_OFFSET +
+                    constants::PADDLE_WIDTH/2;
 
-  if (lefts_turn) {
-    // Find intersection with left wall
-    // x = 0
-    current_target_y_ = solve(b.get_x(), b.get_y(), b.get_radius(),
-                              ball_direction, leading_paddle_edge);
-  } else {    // moving right
-    // right wall
-    // x = WINDOW_WIDTH
-    current_target_y_ = solve(b.get_x(), b.get_y(), b.get_radius(), ball_direction,
-                              constants::WINDOW_WIDTH - leading_paddle_edge);
+  if (!lefts_turn) {   // Aim to other side of window
+    target_x = constants::WINDOW_WIDTH - target_x;
   }
+
+  current_target_y_ = solve(b.get_x(), b.get_y(),
+                            b.get_radius(),
+                            ball_direction,
+                            target_x);
+
+  // Add some innacuracy
+  std::normal_distribution<double> distr(0, constants::BOT_INNACURACY_STD_DEV);
+  current_target_y_ += std::clamp(distr(rand_generator_),
+                                  -constants::PADDLE_HEIGHT/2,
+                                  constants::PADDLE_HEIGHT/2);
 }
