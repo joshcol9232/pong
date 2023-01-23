@@ -17,7 +17,7 @@ namespace constants {
 
   const double BALL_START_SPEED = 350.0;
   const double BALL_RADIUS = 10.0;
-  const double BALL_SPEED_INCREMENT = 100.0;
+  const double BALL_SPEED_INCREMENT = 50.0;
   const double HIT_RANDOM_LIM = M_PI/2;
   const double HIT_RANDOM_STD_DEV = 0.15;
 
