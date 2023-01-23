@@ -4,12 +4,6 @@
 #include <cstddef>
 #include <cmath>
 
-//#define DEBUG   // For debug output
-
-#ifdef DEBUG
-#include <iostream>
-#endif
-
 namespace constants {
   const size_t WINDOW_WIDTH = 800;
   const size_t WINDOW_HEIGHT = 600;
@@ -19,13 +13,13 @@ namespace constants {
   // 0 = two humans
   // 1 = left -> human, right -> bot
   // 2 = both bots
-  const char BOTS = 2;
+  const char BOTS = 1;
 
-  const double BALL_START_SPEED = 1000.0;
+  const double BALL_START_SPEED = 350.0;
   const double BALL_RADIUS = 10.0;
-  const double BALL_SPEED_INCREMENT = 0.0;
-  const double HIT_RANDOM_LIM = 0.5;
-  const double HIT_RANDOM_STD_DEV = 0.1;
+  const double BALL_SPEED_INCREMENT = 100.0;
+  const double HIT_RANDOM_LIM = M_PI/2;
+  const double HIT_RANDOM_STD_DEV = 0.15;
 
   const double PADDLE_WIDTH = 15.0;
   const double PADDLE_HEIGHT = 150.0;
