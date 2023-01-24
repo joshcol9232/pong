@@ -5,6 +5,7 @@
 #include "ball.h"
 #include <random>
 #include <Eigen/Dense>
+#include <SFML/Graphics.hpp>
 
 using Eigen::Vector2d;
 

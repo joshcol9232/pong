@@ -1,7 +1,7 @@
 #ifndef IDENTIFIER_H
 #define IDENTIFIER_H
 
-enum class CollisionIdentifier : short int {
+enum class CollisionIdentifier : char {
   None         = -1,
   LeftPaddle   = 0,
   RightPaddle  = 1,

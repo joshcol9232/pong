@@ -178,11 +178,6 @@ int main() {
       reset();
     }
 
-    // debug with mouse
-//    sf::Vector2i localPosition = sf::Mouse::getPosition(window);
-//    ball.update_mouse(static_cast<double>(localPosition.x),
-//                      static_cast<double>(localPosition.y));
-
     if (lefts_turn && left_paddle.check_collision(ball)) {
       ball.collide(left_paddle);
       increase_speed(ball, left_paddle, right_paddle);

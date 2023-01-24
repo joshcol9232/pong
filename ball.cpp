@@ -51,15 +51,9 @@ void Ball::update(const double dt) {
   }
 }
 
-// DEBUG WITH MOUSE
-void Ball::set_pos(const double x, const double y) {
-  pos_.x() = x;
-  pos_.y() = y;
-}
-
 void Ball::reset() {
-  set_pos(constants::WINDOW_WIDTH/2,
-          constants::WINDOW_HEIGHT/2);
+  pos_.x() = constants::WINDOW_WIDTH/2;
+  pos_.y() = constants::WINDOW_HEIGHT/2;
 
   speed_ = constants::BALL_START_SPEED;
 

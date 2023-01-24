@@ -15,7 +15,6 @@ class Ball {
   Ball(Vector2d pos, double radius);
 
   void update(const double dt);
-  void set_pos(const double x, const double y);
   void collide(const Paddle& p);
   void reset();
   void increase_speed();
