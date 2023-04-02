@@ -1,5 +1,9 @@
 #include <string>
 
+#include <gint/display.h>
+#include <gint/keyboard.h>
+#include <gint/keycodes.h>
+
 #include "ball.h"
 #include "paddle.h"
 #include "constants.h"
@@ -53,8 +57,6 @@ int main() {
   Bot bot;
   bot.change_target(ball, lefts_turn);
 
-  float ball_max_speed = ball.get_speed();
-
   auto reset = [&]() {
     left_paddle.reset();
     right_paddle.reset();
@@ -67,6 +69,8 @@ int main() {
   bool stop = false;
   
   while (!stop) {
+    dclear(C_BLACK);
+
     // 1) Get time diff?
     const float dt = 1.0/30;
 
@@ -75,18 +79,23 @@ int main() {
       bot.update(dt, target_paddle);
 
     // 2) poll keyboard
-    // Process inputs
-    // if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
-    //   right_paddle.move(dt, false);
-    // } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
-    //   right_paddle.move(dt, true);
-    // }
+    const key_event_t key_event =  pollevent();
+    if (key_event.type != KEYEV_NONE &&
+        (key_event.type == KEYEV_HOLD ||
+         key_event.type == KEYEV_DOWN)) {
 
-    // if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
-    //   left_paddle.move(dt, false);
-    // } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
-    //   left_paddle.move(dt, true);
-    // }
+      switch (key_event.key) {
+        case KEY_EXIT:
+          stop = true;
+          break;
+        case KEY_UP:
+          left_paddle.move(dt, false);
+          break;
+        case KEY_DOWN:
+          left_paddle.move(dt, true);
+          break;
+      }
+    }
 
     // 3) update
     ball.update(dt);
@@ -122,10 +131,26 @@ int main() {
     // Draw
 
     // draw ball
+    drect(static_cast<int>(ball.get_x() - ball.get_radius()/2.0),
+          static_cast<int>(ball.get_y() - ball.get_radius()/2.0),
+          static_cast<int>(ball.get_x() + ball.get_radius()/2.0),
+          static_cast<int>(ball.get_y() + ball.get_radius()/2.0),
+          C_WHITE);
 
     // draw paddles
+    drect(static_cast<int>(left_paddle.get_x() - constants::PADDLE_WIDTH/2.0),
+          static_cast<int>(left_paddle.get_y() - constants::PADDLE_HEIGHT/2.0),
+          static_cast<int>(left_paddle.get_x() + constants::PADDLE_WIDTH/2.0),
+          static_cast<int>(left_paddle.get_y() + constants::PADDLE_HEIGHT/2.0),
+          C_WHITE);
 
+    drect(static_cast<int>(right_paddle.get_x() - constants::PADDLE_WIDTH/2.0),
+          static_cast<int>(right_paddle.get_y() - constants::PADDLE_HEIGHT/2.0),
+          static_cast<int>(right_paddle.get_x() + constants::PADDLE_WIDTH/2.0),
+          static_cast<int>(right_paddle.get_y() + constants::PADDLE_HEIGHT/2.0),
+          C_WHITE);
 
+    dupdate();
   }
 
   return 0;

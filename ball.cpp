@@ -23,7 +23,7 @@ inline float random_start_angle() {
 }
 
 Ball::Ball(float pos_x, float pos_y, float radius) :
-  pos_x_(pos_x_), pos_y_(pos_y), radius_(radius),
+  pos_x_(pos_x), pos_y_(pos_y), radius_(radius),
   speed_(constants::BALL_START_SPEED)
 {
   const float angle = random_start_angle();
