@@ -1,28 +1,50 @@
-cmake_minimum_required(VERSION 3.5)
+# Configure with [fxsdk build-fx] or [fxsdk build-cg], which provide the
+# toolchain file and module path of the fxSDK
 
-project(pong LANGUAGES CXX)
+cmake_minimum_required(VERSION 3.15)
+project(pong)
 
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
+include(GenerateG1A)
+include(GenerateG3A)
+include(Fxconv)
 
-#include_directories("")
+# -- Packages --
+find_package(Gint 2.9 REQUIRED)
+# --------------
 
-find_package(SFML 2.5.1 COMPONENTS system graphics audio network REQUIRED)
-find_package(Eigen3 3.4.0 REQUIRED)
+set(SOURCES
+   main.cpp
+   constants.h
+   ball.h ball.cpp
+   paddle.h paddle.cpp
+   bot.h bot.cpp
+   collisionidentifier.h
+  # ...
+)
+# Shared assets, fx-9860G-only assets and fx-CG-50-only assets
+set(ASSETS
+  # ...
+)
+set(ASSETS_fx
+  assets-fx/example.png
+  # ...
+)
+set(ASSETS_cg
+  assets-cg/example.png
+  # ...
+)
 
-configure_file(${CMAKE_SOURCE_DIR}/fonts/Hack-Bold.ttf
-               ${CMAKE_CURRENT_BINARY_DIR}/Hack-Bold.ttf
-               COPYONLY)
+fxconv_declare_assets(${ASSETS} ${ASSETS_fx} ${ASSETS_cg} WITH_METADATA)
 
-add_executable(pong main.cpp
-               constants.h
-               ball.h ball.cpp
-               paddle.h paddle.cpp
-               bot.h bot.cpp
-               collisionidentifier.h)
+add_executable(pong ${SOURCES} ${ASSETS} ${ASSETS_${FXSDK_PLATFORM}})
+target_compile_options(pong PRIVATE -Wall -Wextra -Os -std=c++20)
+target_link_libraries(pong PUBLIC Gint::Gint -lstdc++ -lm)
+add_link_options(-Wl --no-undefined)
 
-target_link_libraries(pong PRIVATE Eigen3::Eigen sfml-audio sfml-graphics sfml-network sfml-system)
-
-#install(TARGETS pong
-#    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
-
+if("${FXSDK_PLATFORM_LONG}" STREQUAL fx9860G)
+  generate_g1a(TARGET pong OUTPUT "pong.g1a"
+    NAME "pong" ICON assets-fx/icon.png)
+elseif("${FXSDK_PLATFORM_LONG}" STREQUAL fxCG50)
+  generate_g3a(TARGET pong OUTPUT "pong.g3a"
+    NAME "pong" ICONS assets-cg/icon-uns.png assets-cg/icon-sel.png)
+endif()

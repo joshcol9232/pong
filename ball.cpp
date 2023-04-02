@@ -1,5 +1,4 @@
-#include <cmath>
-#include <iostream>
+#include <math.h>
 #include <algorithm>
 #include <random>
 
@@ -8,42 +7,43 @@
 
 namespace {
 
-double random_angle(const double low, const double high) {
+float random_angle(const float low, const float high) {
   std::random_device os_seed;
   const auto seed = os_seed();
   std::mt19937 generator(seed);
-  std::uniform_real_distribution<double> distribute(low, high);
+  std::uniform_real_distribution<float> distribute(low, high);
   return distribute(generator);
 }
 
-inline double random_start_angle() {
+inline float random_start_angle() {
   return random_angle(-constants::START_ANGLE_CLAMP,
                       constants::START_ANGLE_CLAMP);
 }
 
 }
 
-Ball::Ball(Vector2d pos, double radius) :
-  pos_(pos), radius_(radius),
+Ball::Ball(float pos_x, float pos_y, float radius) :
+  pos_x_(pos_x_), pos_y_(pos_y), radius_(radius),
   speed_(constants::BALL_START_SPEED)
 {
-  const double angle = random_start_angle();
+  const float angle = random_start_angle();
 
-  direction_.x() = std::cos(angle);
-  direction_.y() = std::sin(angle);
+  direction_x_ = std::cos(angle);
+  direction_y_ = std::sin(angle);
 }
 
-void Ball::update(const double dt) {
-  pos_ += direction_ * speed_ * dt;
+void Ball::update(const float dt) {
+  pos_x_ += direction_x_ * speed_ * dt;
+  pos_y_ += direction_y_ * speed_ * dt;
 
   // wall bouncing
-  if ((pos_.y() < radius_ && last_collided_with_ != CollisionIdentifier::BottomWall) ||
-      (pos_.y() > constants::WINDOW_HEIGHT - radius_ &&
+  if ((pos_y_ < radius_ && last_collided_with_ != CollisionIdentifier::BottomWall) ||
+      (pos_y_ > constants::WINDOW_HEIGHT - radius_ &&
        last_collided_with_ != CollisionIdentifier::TopWall)) {
 
-    direction_.y() *= -1;
+    direction_y_ *= -1;
 
-    if (pos_.y() < radius_) {
+    if (pos_y_ < radius_) {
       last_collided_with_ = CollisionIdentifier::BottomWall;
     } else {
       last_collided_with_ = CollisionIdentifier::TopWall;
@@ -52,33 +52,32 @@ void Ball::update(const double dt) {
 }
 
 void Ball::reset() {
-  pos_.x() = constants::WINDOW_WIDTH/2;
-  pos_.y() = constants::WINDOW_HEIGHT/2;
+  pos_x_ = constants::WINDOW_WIDTH/2;
+  pos_y_ = constants::WINDOW_HEIGHT/2;
 
   speed_ = constants::BALL_START_SPEED;
 
-  const double angle = random_start_angle();
-  std::cout << "ANGLE: " << angle << std::endl;
-  direction_.x() = cos(angle);
-  direction_.y() = sin(angle);
+  const float angle = random_start_angle();
+  direction_x_ = cos(angle);
+  direction_y_ = sin(angle);
 }
 
 void Ball::collide(const Paddle& p) {
-  const double y_dist = p.get_y() - pos_.y();
-  const double angle_ratio = y_dist / constants::PADDLE_HEIGHT/2.0;
+  const float y_dist = p.get_y() - pos_y_;
+  const float angle_ratio = y_dist / constants::PADDLE_HEIGHT/2.0;
 
-  double deflection_angle = angle_ratio * M_PI;
+  float deflection_angle = angle_ratio * constants::PI;
 
   if (p.is_left()) {
     deflection_angle *= -1;
   } else {
-    deflection_angle += M_PI;
+    deflection_angle += constants::PI;
   }
 
   last_collided_with_ = p.collision_id();
 
-  direction_.x() = std::cos(deflection_angle);
-  direction_.y() = std::sin(deflection_angle);
+  direction_x_ = std::cos(deflection_angle);
+  direction_y_ = std::sin(deflection_angle);
 }
 
 void Ball::increase_speed() {

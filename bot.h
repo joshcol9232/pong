@@ -4,26 +4,23 @@
 #include "paddle.h"
 #include "ball.h"
 #include <random>
-#include <Eigen/Dense>
-#include <SFML/Graphics.hpp>
-
-using Eigen::Vector2d;
 
 class Bot {
  public:
   Bot();
 
-  void update(const double dt, Paddle* target) const;
+  void update(const float dt, Paddle* target) const;
   void change_target(const Ball& b, const bool lefts_turn);
 
  private:
-  double solve(const double x_pos,
-               const double y_pos,
-               const double radius,
-               Vector2d ball_direction,
-               const double target_x) const;
+  float solve(const float x_pos,
+               const float y_pos,
+               const float radius,
+               float ball_direction_x_,
+               float ball_direction_y_,
+               const float target_x) const;
 
-  double current_target_y_;
+  float current_target_y_;
   std::mt19937 rand_generator_;
 };
 

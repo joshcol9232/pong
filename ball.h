@@ -1,35 +1,32 @@
 #ifndef BALL_H
 #define BALL_H
 
-#include <Eigen/Dense>
-
 #include "paddle.h"
 #include "collisionidentifier.h"
-
-using Eigen::Vector2d;
 
 class Paddle;  // declare
 
 class Ball {
  public:
-  Ball(Vector2d pos, double radius);
+  Ball(float pos_x, float pos_y, float radius);
 
-  void update(const double dt);
+  void update(const float dt);
   void collide(const Paddle& p);
   void reset();
   void increase_speed();
 
-  inline double get_x() const { return pos_.x(); }
-  inline double get_y() const { return pos_.y(); }
-  inline double get_radius() const { return radius_; }
-  inline double get_speed() const { return speed_; }
-  inline const Vector2d& get_direction() const { return direction_; }
+  inline float get_x() const { return pos_x_; }
+  inline float get_y() const { return pos_y_; }
+  inline float get_radius() const { return radius_; }
+  inline float get_speed() const { return speed_; }
+  inline float get_direction_x() const { return direction_x_; }
+  inline float get_direction_y() const { return direction_y_; }
 
  private:
-  Vector2d pos_;
-  double speed_;
-  double radius_;
-  Vector2d direction_;  // Unit vector
+  float pos_x_, pos_y_;
+  float speed_;
+  float radius_;
+  float direction_x_, direction_y_;  // Unit vector
   CollisionIdentifier last_collided_with_;
 };
 
