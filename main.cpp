@@ -10,7 +10,8 @@
 #include "constants.h"
 #include "bot.h"
 
-#define DT 1.0/60.0
+constexpr float DT = 1.0/60.0;
+constexpr bool DRAW_TARGETING_DEBUG = true;
 
 using Eigen::Vector2d;
 
@@ -209,6 +210,11 @@ int main() {
     window.draw(right_score_text);
     window.draw(ball_speed_text);
     window.draw(ball_max_speed_text);
+
+    // Bot targeting debugging
+    if constexpr (DRAW_TARGETING_DEBUG) {
+      window.draw(bot);
+    }
 
     // fps text
     fps_text.setString(std::to_string(1.0/dt));

@@ -5,8 +5,8 @@
 #include <cmath>
 
 namespace constants {
-  const size_t WINDOW_WIDTH = 800;
-  const size_t WINDOW_HEIGHT = 600;
+  const size_t WINDOW_WIDTH = 2 * 800;
+  const size_t WINDOW_HEIGHT = 2 * 600;
 
   const double START_ANGLE_CLAMP = std::atan2(WINDOW_HEIGHT/2, WINDOW_WIDTH/2);
 
@@ -19,6 +19,7 @@ namespace constants {
   const double PADDLE_OFFSET = PADDLE_WIDTH + 10.0;
   const double PADDLE_START_SPEED = 400.0 + BALL_START_SPEED;
   const double PADDLE_SPEED_INCREMENT = BALL_SPEED_INCREMENT;
+  const double DEFLECTION_ANGLE_MULTIPLIER = 2.0;   // Multiples of PI at which the ball can deflect
 
   // 0 = two humans
   // 1 = left -> human, right -> bot

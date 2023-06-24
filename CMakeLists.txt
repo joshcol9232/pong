@@ -19,6 +19,7 @@ add_executable(pong main.cpp
                ball.h ball.cpp
                paddle.h paddle.cpp
                bot.h bot.cpp
+               SfLine.h
                collisionidentifier.h)
 
 target_link_libraries(pong PRIVATE Eigen3::Eigen sfml-audio sfml-graphics sfml-network sfml-system)

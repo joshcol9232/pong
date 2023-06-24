@@ -67,7 +67,7 @@ void Ball::collide(const Paddle& p) {
   const double y_dist = p.get_y() - pos_.y();
   const double angle_ratio = y_dist / constants::PADDLE_HEIGHT/2.0;
 
-  double deflection_angle = angle_ratio * M_PI;
+  double deflection_angle = angle_ratio * M_PI * constants::DEFLECTION_ANGLE_MULTIPLIER;
 
   if (p.is_left()) {
     deflection_angle *= -1;

@@ -2,8 +2,11 @@
 #include "constants.h"
 #include <iostream>
 #include <iomanip>
+#include <memory>
 
-Bot::Bot(){
+Bot::Bot() :
+  solveHistory_(), current_target_y_(0)
+{
   std::random_device os_seed;
   const auto seed = os_seed();
   rand_generator_ = std::mt19937(seed);
@@ -37,7 +40,7 @@ double Bot::solve(const double x_pos,
                   const double y_pos,
                   const double radius,
                   Vector2d ball_direction,
-                  const double target_x) const {
+                  const double target_x) {
   std::cout << std::setprecision(2) << std::fixed << std::showpoint;
   std::cout << "Bot::solve:\nInputs:" << std::endl
             << "\tx_pos=" << x_pos
@@ -55,6 +58,9 @@ double Bot::solve(const double x_pos,
   // y of line at target_x
   const double y_result = m * target_x + c;
   std::cout << "\ty_result=" << y_result << std::endl;
+
+  solveHistory_.push_back({ sf::Vector2f(static_cast<float>(x_pos),    static_cast<float>(y_pos)),
+                            sf::Vector2f(static_cast<float>(target_x), static_cast<float>(y_result)) });
 
   if (y_result < radius) {
     std::cout << "Bot::solve: wall collision..." << std::endl;
@@ -83,6 +89,7 @@ double Bot::solve(const double x_pos,
 }
 
 void Bot::change_target(const Ball& b, const bool lefts_turn) {
+  clearSolveHistory();  // Clear the solving history from current target
   const auto& ball_direction = b.get_direction();
 
   double target_x = constants::PADDLE_OFFSET +
@@ -100,6 +107,26 @@ void Bot::change_target(const Ball& b, const bool lefts_turn) {
   // Add some innacuracy
   std::normal_distribution<double> distr(0, constants::BOT_INNACURACY_STD_DEV);
   current_target_y_ += std::clamp(distr(rand_generator_),
-                                  -constants::PADDLE_HEIGHT/2,
-                                  constants::PADDLE_HEIGHT/2);
+                                  -constants::PADDLE_HEIGHT/2 + 0.01,
+                                  constants::PADDLE_HEIGHT/2 - 0.01);
+}
+
+void Bot::draw(sf::RenderTarget& target, sf::RenderStates states) const {
+  constexpr double half_thickness = 3.0 / 2.0;
+
+  std::unique_ptr<SfLine> line;
+
+  bool first = true;
+  for (const auto& targetLine : solveHistory_) {
+    if (first) {
+      line.reset(new SfLine(targetLine.start, targetLine.end));
+      first = false;
+    } else {
+      const SfLine line_segment(targetLine.start, targetLine.end);
+      *line += line_segment;
+    }
+  }
+
+  if (!first) [[likely]]
+    target.draw(*line);
 }
